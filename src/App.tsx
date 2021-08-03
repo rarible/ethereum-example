@@ -37,26 +37,26 @@ function App() {
      */
     useEffect(() => {
         if ((window as any).ethereum) {
-            handleEthereum();
+            handleInit();
+        } else {
+            window.addEventListener('ethereum#initialized', handleInit, {
+                once: true,
+            });
+            setTimeout(handleInit, 3000); // 3 seconds
+        }
+
+    }, [])
+
+    function handleInit() {
+        const { ethereum } = window as any;
+        if (ethereum && ethereum.isMetaMask) {
+            console.log('Ethereum successfully detected!');
             setProvider((window as any).ethereum)
             let web3 = new Web3((window as any).ethereum)
             setSdk(createRaribleSdk(web3, network))
             web3.eth.getAccounts().then(e => {
                 setAccounts(e)
             })
-        } else {
-            window.addEventListener('ethereum#initialized', handleEthereum, {
-                once: true,
-            });
-            setTimeout(handleEthereum, 3000); // 3 seconds
-        }
-
-    }, [])
-
-    function handleEthereum() {
-        const { ethereum } = window as any;
-        if (ethereum && ethereum.isMetaMask) {
-            console.log('Ethereum successfully detected!');
         } else {
             console.log('Please install MetaMask!');
         }
@@ -67,6 +67,9 @@ function App() {
      */
     const connectWalletHandler = () => {
         provider.request({ method: 'eth_requestAccounts' })
+        provider.on('accountsChanged', function (accounts: string[]) {
+            setAccounts(accounts)
+        });
     }
 
     /**
