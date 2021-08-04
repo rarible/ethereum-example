@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import Web3 from "web3";
-import {createRaribleSdk, RaribleSdk} from "@rarible/protocol-ethereum-sdk";
-import {NftItem} from "@rarible/protocol-api-client/build/models";
+import {createRaribleSdk, RaribleSdk} from "@rarible/protocol-ethereum-sdk"
+import {NftItem} from "@rarible/protocol-api-client";
 import {testSignAndCreateLazyMint} from "./lazy-mint/script";
 import {retry} from "./utils/retry";
 import { toAddress, toBigNumber } from "@rarible/types"
@@ -24,15 +24,15 @@ type BuyOrderFormState = {
 
 function App() {
     const [provider, setProvider] = useState<any>()
-    const [accounts, setAccounts] = useState<string[]>([])
     const [sdk, setSdk] = useState<RaribleSdk>()
+    const [accounts, setAccounts] = useState<string[]>([])
     const [mintedNft, setMintedNft] = useState<NftItem>()
+    const [ownedItems, setOwnedItems] = useState<NftItem[]>()
     const [order, setOrder] = useState<SimpleOrder>()
     const [createOrderForm, setCreateOrderForm] = useState<CreateOrderFormState>({contract: '', tokenId: '', price: 10, hash: ''})
     const [purchaseOrderForm, setPurchaseOrderForm] = useState<BuyOrderFormState>({hash: '', amount: '1'})
 
     /**
-     * Handle provider and set it to web3
      * Initialize SDK
      */
     useEffect(() => {
@@ -47,13 +47,21 @@ function App() {
 
     }, [])
 
+    // Handle provider and set it to web3
     function handleInit() {
         const { ethereum } = window as any;
         if (ethereum && ethereum.isMetaMask) {
             console.log('Ethereum successfully detected!');
-            setProvider((window as any).ethereum)
-            let web3 = new Web3((window as any).ethereum)
-            setSdk(createRaribleSdk(web3, network))
+            setProvider(ethereum)
+
+            // add listener on accountsChanged event to render actual address
+            ethereum.on('accountsChanged', setAccounts);
+            // configure web3
+            const web3 = new Web3(ethereum)
+            // configure raribleSdk
+            const raribleSdk = createRaribleSdk(web3, network)
+            setSdk(raribleSdk)
+            // set current account if already connected
             web3.eth.getAccounts().then(e => {
                 setAccounts(e)
             })
@@ -67,23 +75,26 @@ function App() {
      */
     const connectWalletHandler = () => {
         provider.request({ method: 'eth_requestAccounts' })
-        provider.on('accountsChanged', function (accounts: string[]) {
-            setAccounts(accounts)
-        });
+    }
+
+    const getOwnedItems = async () => {
+        const items = await sdk?.apis.nftItem.getNftItemsByOwner({owner: accounts[0]})
+        setOwnedItems(items?.items)
     }
 
     /**
      * Mint Nft
      */
-    const lazyMint = () => {
-        testSignAndCreateLazyMint()
-            .then(async (x) => {
-                setMintedNft(x)
+    const lazyMint = async () => {
+        const item = await testSignAndCreateLazyMint()
+            if (item) {
+                setMintedNft(item)
+                await getOwnedItems()
                 retry(30, async () => {
                     /**
                      * Get minted nft thru SDK
                      */
-                    const token = await sdk?.apis.nftItem.getNftItemById({itemId: `${x?.id}:${x.owners[0]}`})
+                    const token = await sdk?.apis.nftItem.getNftItemById({itemId: `${item.id}:${item.owners[0]}`})
                     if (token) {
                         setCreateOrderForm({
                             ...createOrderForm,
@@ -92,8 +103,7 @@ function App() {
                         })
                     }
                 })
-            })
-            .catch(err => console.error("ERROR", err))
+            }
     }
 
     const handleChangeOrderContract = (e: React.FormEvent<HTMLInputElement>): void => {
@@ -111,7 +121,6 @@ function App() {
      */
     const createSellOrder = async () => {
         if (createOrderForm.contract && createOrderForm.tokenId && createOrderForm.price) {
-            console.log(mintedNft)
             const request: SellRequest = {
                 makeAssetType: {
                     assetClass: "ERC721",
@@ -139,7 +148,8 @@ function App() {
      */
     const handlePurchaseOrder = async () => {
         if (order) {
-            await sdk?.order.fill(order, { payouts: [], originFees: [], amount: parseInt(purchaseOrderForm.amount), infinite: true })
+            const hash = await sdk?.order.fill(order, { amount: parseInt(purchaseOrderForm.amount) }).then(a => a.runAll())
+            console.log('hash', hash)
         }
     }
 
@@ -149,19 +159,36 @@ function App() {
         {accounts.length ? 'Connected' : 'Connect wallet'}
         </button>
         {accounts.length && <span>Connected address: {accounts[0]}</span>}
-        <div style={{padding: '4px'}}><button onClick={lazyMint}>lazy mint</button></div>
         <div style={{padding: '4px'}}>
+            <p>Mint item form (TODO)</p>
+            <button onClick={lazyMint}>lazy mint</button>
+        </div>
+        <div style={{padding: '4px'}}>
+            <p>Create sell order form</p>
             <input onChange={e => handleChangeOrderContract(e)} value={createOrderForm?.contract} placeholder={"Contract address"}/>
             <input onChange={e => handleChangeOrderTokenId(e)} value={createOrderForm?.tokenId} placeholder={"Token Id"}/>
             <input onChange={e => handleChangeOrderPrice(e)} value={createOrderForm?.price} placeholder={"Price"}/>
             <button onClick={createSellOrder}>
-                Sell erc721
+                Sell
             </button>
         </div>
         <div style={{padding: '4px'}}>
+            <p>Purchase created order form</p>
             <input value={purchaseOrderForm.hash} placeholder={'Order hash'}/>
             <input value={purchaseOrderForm.amount} placeholder={'amount'}/>
             <button onClick={handlePurchaseOrder}>Purchase</button>
+        </div>
+        <div>
+            <p>NFT items owned by me</p>
+            <ul>
+                {ownedItems?.length && ownedItems.map(i => {
+                    return (
+                        <li>
+                            <p>Item id: {i.id}</p>
+                        </li>
+                    )
+                })}
+            </ul>
         </div>
     </div>
     );

@@ -43,7 +43,7 @@ function getAddress(type: "ERC721" | "ERC1155"): string {
 	// ropsten
 	// return type === "ERC721" ? "0xB0EA149212Eb707a1E5FC1D2d3fD318a8d94cf05" : "0x6a94aC200342AC823F909F142a65232E2f052183"
 	// rinkeby
-	return type === "ERC721" ? "0x75fDbe19C2dc673384dDc14C9F453dB86F5f32E8" : "0x0cF0AAb68432a3710ECbf2f1b112a11cEe31a83C"
+	return type === "ERC721" ? "0x509fd4cdaa29be7b1fad251d8ea0fca2ca91eb60" : "0x0cF0AAb68432a3710ECbf2f1b112a11cEe31a83C"
 
 }
 
