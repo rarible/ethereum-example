@@ -44,7 +44,7 @@ const Dashboard: React.FC<DashboardProps> = ({ provider, sdk, accounts }) => {
 	 * Mint Nft
 	 */
 	const lazyMint = async () => {
-		const item = await sdk?.nft.mintLazy({
+		const item = await sdk.nft.mintLazy({
 			'@type': 'ERC721',
 			contract: toAddress('0x6ede7f3c26975aad32a475e1021d8f6f39c89d82'), // rinkeby default Rarible collection
 			uri: "/ipfs/QmWLsBu6nS4ovaHbGAXprD1qEssJu4r5taQfB74sCG51tp",
@@ -55,7 +55,7 @@ const Dashboard: React.FC<DashboardProps> = ({ provider, sdk, accounts }) => {
 			/**
 			 * Get minted nft through SDK
 			 */
-			const token = await sdk?.apis.nftItem.getNftItemById({ itemId: item.id })
+			const token = await sdk.apis.nftItem.getNftItemById({ itemId: item.id })
 			if (token) {
 				setCreateOrderForm({
 					...createOrderForm,
@@ -85,7 +85,7 @@ const Dashboard: React.FC<DashboardProps> = ({ provider, sdk, accounts }) => {
 				takeAssetType: { assetClass: "ETH" },
 			}
 			// Create an order
-			const resultOrder = await sdk?.order.sell(request).then(a => a.runAll())
+			const resultOrder = await sdk.order.sell(request).then(a => a.runAll())
 			if (resultOrder) {
 				setOrder(resultOrder)
 				setPurchaseOrderForm({ ...purchaseOrderForm, hash: resultOrder.hash })
@@ -98,7 +98,7 @@ const Dashboard: React.FC<DashboardProps> = ({ provider, sdk, accounts }) => {
 	 */
 	const handlePurchaseOrder = async () => {
 		if (order) {
-			await sdk?.order.fill(order, { amount: parseInt(purchaseOrderForm.amount) }).then(a => a.runAll())
+			await sdk.order.fill(order, { amount: parseInt(purchaseOrderForm.amount) }).then(a => a.runAll())
 		}
 	}
 
@@ -106,7 +106,7 @@ const Dashboard: React.FC<DashboardProps> = ({ provider, sdk, accounts }) => {
 	 * Handle get NFT's owned by connected wallet
 	 */
 	const handleGetMyNfts = async () => {
-		const items = await sdk?.apis.nftItem.getNftItemsByOwner({ owner: accounts[0] })
+		const items = await sdk.apis.nftItem.getNftItemsByOwner({ owner: accounts[0] })
 		setOwnedItems(items?.items)
 	}
 
