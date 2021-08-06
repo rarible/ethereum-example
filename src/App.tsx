@@ -85,7 +85,7 @@ function App() {
 	const lazyMint = async () => {
 		const item = await sdk?.nft.mintLazy({
 			'@type': 'ERC721',
-			contract: toAddress('0x509fd4cdaa29be7b1fad251d8ea0fca2ca91eb60'), // rinkeby default Rarible collection
+			contract: toAddress('0x6ede7f3c26975aad32a475e1021d8f6f39c89d82'), // rinkeby default Rarible collection
 			uri: "/ipfs/QmWLsBu6nS4ovaHbGAXprD1qEssJu4r5taQfB74sCG51tp",
 			creators: [{ account: toAddress(accounts[0]), value: 10000 }],
 			royalties: [],
