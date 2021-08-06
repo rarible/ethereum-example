@@ -47,7 +47,7 @@ function App() {
 			console.log('Please install MetaMask!')
 		}
 	}
-	
+
 	if (!provider?.isMetaMask) {
 		return <strong>Please install metamask to use the app</strong>
 	} else {
