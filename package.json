@@ -43,7 +43,6 @@
     ]
   },
   "devDependencies": {
-    "@rarible/protocol-ethereum-sdk": "^0.0.7",
-    "http-proxy-middleware": "^2.0.1"
+    "@rarible/protocol-ethereum-sdk": "^0.0.8"
   }
 }
