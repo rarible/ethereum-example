@@ -23,8 +23,8 @@ github [CRA](https://github.com/facebook/create-react-app) repo
 
 #### Configuring RaribleSDK
 
-For this example we use simple non styled .tsx template and local state management. full example of `App.tsx` you can
-find in `src/` folder in root of repository.
+For this example we use simple non styled .tsx template and local state management. full example of app you can find
+in `src/` folder in root of repository in App.tsx and Dashboard.tsx components.
 
 Let's create a new function in the App.tsx file named `handleInit`. Which serves to check the presence of the Metamask
 provider in the browser and create an instance of the SDK.
@@ -81,7 +81,7 @@ useEffect(() => {
 #### Create Lazy mint NFT item
 
 Now we need some nft object to interact with it. the code below shows how you can create lazy-mint ERC721 token nft
-using SDK. Create a new async function inside our App.tsx component called `lazyMint`
+using SDK. Create a new async function inside our Dashboard.tsx component called `lazyMint`
 
 ```typescript
 const lazyMint = async () => {
