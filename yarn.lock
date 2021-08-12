@@ -1636,21 +1636,21 @@
     ganache-core "2.13.2"
     typescript "4.3.5"
 
-"@rarible/protocol-api-client@0.0.7":
-  version "0.0.7"
-  resolved "https://registry.yarnpkg.com/@rarible/protocol-api-client/-/protocol-api-client-0.0.7.tgz#e56bf7c8b550dc7c83fdd5f4f194eaa464bdf5e9"
-  integrity sha512-THHlwtz3wj7iXDS2vIv5uTm4XVi9uje8JZwAtzWUncg9xg7oVCCFLqXL0ZNkeYUQX6g3+YzXYF5L0dTaMRz+8w==
+"@rarible/protocol-api-client@0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@rarible/protocol-api-client/-/protocol-api-client-0.1.1.tgz#0669d24280874f025db0fd9be3d43d731a57fb0f"
+  integrity sha512-GCUzDEryVav+83YzfqWqDemdSHWhsO9DyK7ILa1NHuOdUPrZWjjiZIjX4kegsigL5nlo2EhrcGgHnSMtWm9s1g==
   dependencies:
     "@rarible/types" "0.1.3"
 
-"@rarible/protocol-ethereum-sdk@^0.1.1":
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/@rarible/protocol-ethereum-sdk/-/protocol-ethereum-sdk-0.1.1.tgz#72308572d32657d8593a6be0f619a2e547eb431c"
-  integrity sha512-wJ5u/sxIjKHm8mTgQtyHXjo1dNeb/hiKcx9P/JHsW7GT4QPg75gviOv5OUZ4yb16eAd1z0WU0EHnSG2K8YwvMw==
+"@rarible/protocol-ethereum-sdk@0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@rarible/protocol-ethereum-sdk/-/protocol-ethereum-sdk-0.1.2.tgz#1cd5247bb16d34fdfc6a98c4c5b55d4fe2e511e0"
+  integrity sha512-9tktWHRI5EjbFA9CUB4ZETWA/nmQsUhQY3OsogBRUMa9G2StOrz7emLGsBMgf9nr/3Myljb0f+Y7m6cUDY70bQ==
   dependencies:
     "@rarible/action" "0.1.2"
     "@rarible/ethereum-provider" "^0.1.1"
-    "@rarible/protocol-api-client" "0.0.7"
+    "@rarible/protocol-api-client" "0.1.1"
     eth-sig-util "^3.0.1"
     ethereumjs-util "^7.1.0"
     exponential-backoff "^3.1.0"
@@ -1660,7 +1660,7 @@
   resolved "https://registry.yarnpkg.com/@rarible/types/-/types-0.1.3.tgz#c706ee0b1535b2d0d84dee54fb33c4aabacc72aa"
   integrity sha512-cKZ6Pl8hP6IXvuIjBHi84IHd871M8dJRiSTgBNVgtht4ul0aFowAmHJCzj+Y8kTDvfFdgj5wDm6TNYM0C5KnGA==
 
-"@rarible/web3-ethereum@^0.1.1":
+"@rarible/web3-ethereum@0.1.1":
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/@rarible/web3-ethereum/-/web3-ethereum-0.1.1.tgz#988dce8f5472815767ae0c382e1911e24c907a37"
   integrity sha512-q+kyVdyAbtL7sSKMSzHlnBWEBIqSSBQi50yZsG7/6I8LTWPGZoWCKt3wSkZWTn7nV62mjJNrt8Ac8isw/hXF5g==
