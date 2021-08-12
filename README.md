@@ -46,7 +46,7 @@ provider in the browser and create an instance of the SDK.
         const web3 = new Web3(ethereum)
         
         // configure raribleSdk
-        const raribleSdk = createRaribleSdk(web3, 'rinkeby')
+			const raribleSdk = createRaribleSdk(new Web3Ethereum({ web3 }), network)
         // set created Rarible SDK into state
         setSdk(raribleSdk)
         

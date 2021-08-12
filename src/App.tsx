@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import Web3 from "web3"
 import { createRaribleSdk, RaribleSdk } from "@rarible/protocol-ethereum-sdk"
-import { network } from "./config"
 import './App.css'
 import Dashboard from "./Dashboard"
+import { Web3Ethereum } from "@rarible/web3-ethereum"
+
+const NETWORK = "rinkeby"
 
 function App() {
 	const [provider, setProvider] = useState<any>()
@@ -37,7 +39,7 @@ function App() {
 			// configure web3
 			const web3 = new Web3(ethereum)
 			// configure raribleSdk
-			const raribleSdk = createRaribleSdk(web3, network)
+			const raribleSdk = createRaribleSdk(new Web3Ethereum({ web3 }), NETWORK)
 			setSdk(raribleSdk)
 			// set current account if already connected
 			web3.eth.getAccounts().then(e => {
