@@ -139,7 +139,7 @@ const Dashboard: React.FC<DashboardProps> = ({ provider, sdk, accounts }) => {
 		if (createOrderForm.contract && createOrderForm.tokenId && createOrderForm.price) {
 			const request: SellRequest = {
 				makeAssetType: {
-					assetClass: "ERC721",
+					assetClass: collection.type,
 					contract: toAddress(createOrderForm.contract),
 					tokenId: toBigNumber(createOrderForm.tokenId),
 				},
