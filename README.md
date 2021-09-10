@@ -14,8 +14,8 @@ Lets start new react ts project and add dependencies
 
 ```shell
 npx create-react-app protocol-example --template typescript
-yarn add web3
-yarn add -D @rarible/protocol-ethereum-sdk
+
+yarn add @rarible/protocol-ethereum-sdk@0.1.4 @ethereumjs/common@^2.4.0 @ethereumjs/tx@^3.3.0 @rarible/action@0.2.5 @rarible/protocol-api-client@0.1.4 ethereumjs-util@^7.1.0 tslib@^2.3.1 web3@1.2.11 web3-eth-contract@1.2.11 web3-utils@1.2.11 @rarible/types@0.1.2
 ```
 
 ```create-react-app``` - creates blank react app project. Learn more about command options on their
@@ -78,42 +78,94 @@ useEffect(() => {
 }, [])
 ```
 
-#### Create Lazy mint NFT item
+#### Mint NFT items
 
-Now we need some nft object to interact with it. the code below shows how you can create lazy-mint ERC721 token nft
-using SDK. Create a new async function inside our Dashboard.tsx component called `lazyMint`
+We can mint ERC721 or ERC1155 nft items through Rarible SDK, and both of it can be minted "on chain" of "off chain"(
+lazy).
+
+The code below shows how you can mint nft token using SDK. Full component code example located in `src/Dashboard.tsx`
 
 ```typescript
-const lazyMint = async () => {
-    const item = await sdk?.nft.mintLazy({
-        '@type': 'ERC721', // type of NFT to mint
-        contract: toAddress('0x6ede7f3c26975aad32a475e1021d8f6f39c89d82'), // rinkeby default Rarible collection
-        uri: "/ipfs/QmWLsBu6nS4ovaHbGAXprD1qEssJu4r5taQfB74sCG51tp", // tokenUri, url to media that nft stores
-        creators: [{ account: toAddress(accounts[0]), value: 10000 }], // list of creators
-        royalties: [], // royalties
-    })
-    if (item) {
-        /**
-         * Get minted nft through SDK
-         */
-        const token = await sdk?.apis.nftItem.getNftItemById({ itemId: item.id })
-
-        if (token) {
-            setCreateOrderForm({
-                ...createOrderForm,
-                contract: token.contract,
-                tokenId: token.tokenId,
-            })
-        }
-    }
+type MintForm = {
+	id: string,
+	type: NftCollection_Type,
+	isLazySupported: boolean,
+	isLazy: boolean,
+	loading: boolean
 }
+
+const mintFormInitial: MintForm = {
+	id: "0x6ede7f3c26975aad32a475e1021d8f6f39c89d82", // default collection on "rinkeby" that supports lazy minting
+	type: "ERC721",
+	isLazy: true,
+	isLazySupported: true,
+	loading: false,
+}
+...
+
+const Dashboard: React.FC<DashboardProps> = ({ provider, sdk, accounts }) => {
+
+	const [collection, setCollection] = useState<MintForm>(mintFormInitial)
+...
+
+...
+	const mint = async () => {
+		let tokenId: string
+		const prepareCollection = {
+			id: toAddress(collection.id),
+			type: collection.type,
+			supportsLazyMint: collection.isLazySupported,
+		}
+		if (isLazyErc721Collection(prepareCollection)) {
+			tokenId = await sdk.nft.mint({
+				collection: prepareCollection,
+				uri: "/ipfs/QmWLsBu6nS4ovaHbGAXprD1qEssJu4r5taQfB74sCG51tp",
+				creators: [{ account: toAddress(accounts[0]), value: 10000 }],
+				royalties: [],
+				lazy: collection.isLazy,
+			})
+		} else if (isLazyErc1155Collection(prepareCollection)) {
+			tokenId = await sdk.nft.mint({
+				collection: prepareCollection,
+				uri: "/ipfs/QmWLsBu6nS4ovaHbGAXprD1qEssJu4r5taQfB74sCG51tp",
+				creators: [{ account: toAddress(accounts[0]), value: 10000 }],
+				royalties: [],
+				supply: toBigNumber('1'),
+				lazy: collection.isLazy,
+			})
+		} else if (isLegacyErc721Collection(prepareCollection)) {
+			tokenId = await sdk.nft.mint({
+				collection: prepareCollection,
+				uri: "/ipfs/QmWLsBu6nS4ovaHbGAXprD1qEssJu4r5taQfB74sCG51tp",
+				royalties: [],
+			})
+		} else if (isLegacyErc1155Collection(prepareCollection)) {
+			tokenId = await sdk.nft.mint({
+				collection: prepareCollection,
+				uri: "/ipfs/QmWLsBu6nS4ovaHbGAXprD1qEssJu4r5taQfB74sCG51tp",
+				royalties: [],
+				supply: 1,
+			})
+		} else {
+			tokenId = ""
+			console.log("Wrong collection")
+		}
+
+		if (tokenId) {
+			/**
+			 * Get minted nft through SDK
+			 */
+			if (collection.isLazySupported && !collection.isLazy) {
+				await retry(30, async () => { // wait when indexer aggregate an onChain nft
+						await getTokenById(tokenId)
+					},
+				)
+			} else {
+				await getTokenById(tokenId)
+			}
+		}
+	}
 ```
-
-What it's going on?
-
-- `sdk.nft.mintLazy` - create lazy minted NFT token
-- `sdk.apis.nftItem.getNftItemById` - returns the created token object by `itemId` from the server (there is no need to
-  use it here because method `sdk.nft.mintLazy` returns the same object, we will use it for example only)
 
 #### Create sell order
 
