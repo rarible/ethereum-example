@@ -78,7 +78,7 @@ const Dashboard: React.FC<DashboardProps> = ({ provider, sdk, accounts }) => {
 				creators: [{ account: toAddress(accounts[0]), value: 10000 }],
 				royalties: [],
 				lazy: collection.isLazy,
-			}) as string //todo remove when sdk updates to next version
+			})
 		} else if (isLazyErc1155Collection(prepareCollection)) {
 			tokenId = await sdk.nft.mint({
 				collection: prepareCollection,
@@ -87,20 +87,20 @@ const Dashboard: React.FC<DashboardProps> = ({ provider, sdk, accounts }) => {
 				royalties: [],
 				supply: toBigNumber('1'),
 				lazy: collection.isLazy,
-			}) as string //todo
+			})
 		} else if (isLegacyErc721Collection(prepareCollection)) {
 			tokenId = await sdk.nft.mint({
 				collection: prepareCollection,
 				uri: "/ipfs/QmWLsBu6nS4ovaHbGAXprD1qEssJu4r5taQfB74sCG51tp",
 				royalties: [],
-			}) as string //todo
+			})
 		} else if (isLegacyErc1155Collection(prepareCollection)) {
 			tokenId = await sdk.nft.mint({
 				collection: prepareCollection,
 				uri: "/ipfs/QmWLsBu6nS4ovaHbGAXprD1qEssJu4r5taQfB74sCG51tp",
 				royalties: [],
 				supply: 1,
-			}) as string //todo
+			})
 		} else {
 			tokenId = ""
 			console.log("Wrong collection")
