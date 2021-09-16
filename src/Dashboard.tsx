@@ -66,21 +66,18 @@ const Dashboard: React.FC<DashboardProps> = ({ provider, sdk, accounts }) => {
 	 */
 	const mint = async () => {
 		let tokenId: string
-		const prepareCollection = {
-			id: toAddress(collection.id),
-			type: collection.type,
-			supportsLazyMint: collection.isLazySupported,
-		}
+		const prepareCollection = await sdk.apis.nftCollection.getNftCollectionById({ collection: collection.id })
 		if (isLazyErc721Collection(prepareCollection)) {
-			tokenId = await sdk.nft.mint({
+			const resp = await sdk.nft.mint({
 				collection: prepareCollection,
 				uri: "/ipfs/QmWLsBu6nS4ovaHbGAXprD1qEssJu4r5taQfB74sCG51tp",
 				creators: [{ account: toAddress(accounts[0]), value: 10000 }],
 				royalties: [],
 				lazy: collection.isLazy,
 			})
+			tokenId = resp.tokenId
 		} else if (isLazyErc1155Collection(prepareCollection)) {
-			tokenId = await sdk.nft.mint({
+			const resp = await sdk.nft.mint({
 				collection: prepareCollection,
 				uri: "/ipfs/QmWLsBu6nS4ovaHbGAXprD1qEssJu4r5taQfB74sCG51tp",
 				creators: [{ account: toAddress(accounts[0]), value: 10000 }],
@@ -88,19 +85,22 @@ const Dashboard: React.FC<DashboardProps> = ({ provider, sdk, accounts }) => {
 				supply: toBigNumber('1'),
 				lazy: collection.isLazy,
 			})
+			tokenId = resp.tokenId
 		} else if (isLegacyErc721Collection(prepareCollection)) {
-			tokenId = await sdk.nft.mint({
+			const resp = await sdk.nft.mint({
 				collection: prepareCollection,
 				uri: "/ipfs/QmWLsBu6nS4ovaHbGAXprD1qEssJu4r5taQfB74sCG51tp",
 				royalties: [],
 			})
+			tokenId = resp.tokenId
 		} else if (isLegacyErc1155Collection(prepareCollection)) {
-			tokenId = await sdk.nft.mint({
+			const resp = await sdk.nft.mint({
 				collection: prepareCollection,
 				uri: "/ipfs/QmWLsBu6nS4ovaHbGAXprD1qEssJu4r5taQfB74sCG51tp",
 				royalties: [],
 				supply: 1,
 			})
+			tokenId = resp.tokenId
 		} else {
 			tokenId = ""
 			console.log("Wrong collection")

@@ -50,7 +50,7 @@
     semver "^5.4.1"
     source-map "^0.5.0"
 
-"@babel/core@>=7.4.0", "@babel/core@^7.1.0", "@babel/core@^7.12.3", "@babel/core@^7.7.5", "@babel/core@^7.8.4":
+"@babel/core@^7.1.0", "@babel/core@^7.12.3", "@babel/core@^7.7.5", "@babel/core@^7.8.4":
   version "7.15.5"
   resolved "https://registry.yarnpkg.com/@babel/core/-/core-7.15.5.tgz#f8ed9ace730722544609f90c9bb49162dc3bf5b9"
   integrity sha512-pYgXxiwAgQpgM1bNkZsDEq85f0ggXMA5L7c+o3tskGMh2BunCI9QUwB9Z4jpvXUOuMdyGKiGKQiRe11VS6Jzvg==
@@ -1729,42 +1729,46 @@
   resolved "https://registry.yarnpkg.com/@rarible/action/-/action-0.2.7.tgz#8c137cccbb41a4d319614dfbe983cf378399ac2c"
   integrity sha512-BHF8O3ZigY943fSA1oy5iR7yvnENvOYIS/yUDnOhOuKcRH7JAHyrsfPi2DmzqZl1zK3V/O6WBmV+VRgWlPQ48w==
 
-"@rarible/ethereum-provider@^0.1.11":
-  version "0.1.11"
-  resolved "https://registry.yarnpkg.com/@rarible/ethereum-provider/-/ethereum-provider-0.1.11.tgz#85aa17947c563c089abf24654dddb3b075e751f0"
-  integrity sha512-8NKpmP9mxPmDVwCbUFUp5sVY4Xl9I6JI0Q9Xs59pLPgB3iUANivW8cmQa1XBxC8Expq4xqgQKV2Zu6RSKRf9/A==
+"@rarible/ethereum-provider@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@rarible/ethereum-provider/-/ethereum-provider-0.3.0.tgz#bb9dc49a35a2e74745c161a7322bc94834eb7944"
+  integrity sha512-r9tRTFqXD1YNMm6Hmy82bn1mzP85OPspubV7+D8VU6ZlxxrYi1qAvhFe7Qs7BrBMODZHjQQU/Z4Bw8HSV36cLQ==
 
-"@rarible/protocol-api-client@0.1.6":
-  version "0.1.6"
-  resolved "https://registry.yarnpkg.com/@rarible/protocol-api-client/-/protocol-api-client-0.1.6.tgz#d3f8ac913cff2aae3774f47f5b1dc0c39c7aee1a"
-  integrity sha512-2O6vyuCiGRR0FVXoFNB+h+QKrKQbw7Kqst3nH4pTGrOuABZhvED8LV9am+cmQx4BghVle/I20XpxvmueWLBf8A==
-
-"@rarible/protocol-ethereum-sdk@0.1.15":
-  version "0.1.15"
-  resolved "https://registry.yarnpkg.com/@rarible/protocol-ethereum-sdk/-/protocol-ethereum-sdk-0.1.15.tgz#3006a8ab0d9c9e0ec03472bf3c106a4881655d73"
-  integrity sha512-QwXHRmlcZKVznlGWu/bGwBUnMPvxfkZhxlzxG7zy0KezYDK7+0cpsb2UMprA4JPUQsrsBd0f1Prpvi6iT3RebA==
+"@rarible/protocol-api-client@0.1.7":
+  version "0.1.7"
+  resolved "https://registry.yarnpkg.com/@rarible/protocol-api-client/-/protocol-api-client-0.1.7.tgz#7a125eaed2083052deb5f7bf7dba409246011d47"
+  integrity sha512-MWNPJlil3Wg6R+bn2wDWdQVI22jo0C1H4ajudhceGpfMBLnB1lRM38SAdRfpm3FgLwB/N2I4FwVQIeZObZKgtA==
   dependencies:
-    "@rarible/ethereum-provider" "^0.1.11"
+    "@rarible/types" "^0.1.7"
 
-"@rarible/types@0.1.7":
+"@rarible/protocol-ethereum-sdk@0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@rarible/protocol-ethereum-sdk/-/protocol-ethereum-sdk-0.3.0.tgz#bf88a3955a22cad815102c1bef63b380dcf30671"
+  integrity sha512-6cgUZARWakXlGljFUtxFmHErtagixyqM/upZjscgFPZq2Yf97NM5spUtacPYksDI+XLj+0CPidNcSBJwnUESnQ==
+  dependencies:
+    "@rarible/action" "0.2.7"
+    "@rarible/ethereum-provider" "^0.3.0"
+    "@rarible/protocol-api-client" "0.1.7"
+    "@rarible/utils" "^0.0.3"
+
+"@rarible/types@^0.1.7":
   version "0.1.7"
   resolved "https://registry.yarnpkg.com/@rarible/types/-/types-0.1.7.tgz#b88eeb7961f461067207c9f9cab73cf23dba1da3"
   integrity sha512-rq0vGMQlnTQstTPwmFy8lajkOaCTOe7Odf/W1g6o3uLUD6Dlj0Vroh2/erfiyA6vuDALrATWsP5mw2berdwrTw==
 
-"@rarible/utils@0.0.3":
+"@rarible/utils@^0.0.3":
   version "0.0.3"
   resolved "https://registry.yarnpkg.com/@rarible/utils/-/utils-0.0.3.tgz#543001a4373153936a1621917817f4d72121eea6"
   integrity sha512-C2zh2SO1tWAMFrcYHMzyXFAj+gccGGcWFIHq7d7g/A/h3PKeeJCWjLquoIFzbCBebxIlMnadGs7+64lPt6nejg==
   dependencies:
     bignumber.js "9.0.1"
 
-"@rarible/web3-ethereum@0.1.13":
-  version "0.1.13"
-  resolved "https://registry.yarnpkg.com/@rarible/web3-ethereum/-/web3-ethereum-0.1.13.tgz#86b864648462ed4b973ed65c236aa8104403c9db"
-  integrity sha512-wlG+KCscMBL/Bm+vJRsh8pVW02mN6y9eRNrRKev8/SmXaCsHsZfuJnNvQIChsy7+8ElAea2nxg1ET3lMO+jjiw==
+"@rarible/web3-ethereum@0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@rarible/web3-ethereum/-/web3-ethereum-0.3.0.tgz#3e78c1370055b416e9b1cafd53c2c85c87050bf5"
+  integrity sha512-agCAlGVs7QbYb806bUpZ1wgHISc7C40MO+TNvPH4LUZbzhU+rGHngoD+Ac0d0Y6nOgsFB94+Bo7ApoMvud8BIQ==
   dependencies:
-    "@rarible/ethereum-provider" "^0.1.11"
-    eth-rpc-errors "4.0.3"
+    "@rarible/ethereum-provider" "^0.3.0"
     exponential-backoff "3.1.0"
 
 "@rollup/plugin-node-resolve@^7.1.1":
@@ -5319,7 +5323,7 @@ eth-lib@^0.1.26:
     ws "^3.0.0"
     xhr-request-promise "^0.1.2"
 
-eth-rpc-errors@4.0.3:
+eth-rpc-errors@^4.0.3:
   version "4.0.3"
   resolved "https://registry.yarnpkg.com/eth-rpc-errors/-/eth-rpc-errors-4.0.3.tgz#6ddb6190a4bf360afda82790bb7d9d5e724f423a"
   integrity sha512-Z3ymjopaoft7JDoxZcEb3pwdGh7yiYMhOwm2doUt6ASXlMavpNlK6Cre0+IMl2VSGyEU9rkiperQhp5iRxn5Pg==
