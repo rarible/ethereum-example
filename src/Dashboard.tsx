@@ -1,6 +1,5 @@
 import { SellRequest } from "@rarible/protocol-ethereum-sdk/build/order/sell"
 import React, { useState } from "react"
-import { SimpleOrder } from "@rarible/protocol-ethereum-sdk/build/order/sign-order"
 import {
 	isLazyErc1155Collection,
 	isLazyErc721Collection,
@@ -46,7 +45,6 @@ const mintFormInitial: MintForm = {
 const Dashboard: React.FC<DashboardProps> = ({ provider, sdk, accounts }) => {
 	const [collection, setCollection] = useState<MintForm>(mintFormInitial)
 	const [ownedItems, setOwnedItems] = useState<NftItem[]>()
-	const [order, setOrder] = useState<SimpleOrder>()
 	const [createOrderForm, setCreateOrderForm] = useState<CreateOrderFormState>({
 		contract: '',
 		tokenId: '',
@@ -153,7 +151,6 @@ const Dashboard: React.FC<DashboardProps> = ({ provider, sdk, accounts }) => {
 			// Create an order
 			const resultOrder = await sdk.order.sell(request).then(a => a.build().runAll())
 			if (resultOrder) {
-				setOrder(resultOrder)
 				setPurchaseOrderForm({ ...purchaseOrderForm, hash: resultOrder.hash })
 			}
 		}
@@ -163,6 +160,7 @@ const Dashboard: React.FC<DashboardProps> = ({ provider, sdk, accounts }) => {
 	 * Buy order
 	 */
 	const handlePurchaseOrder = async () => {
+		const order = await sdk.apis.order.getOrderByHash({ hash: purchaseOrderForm.hash })
 		if (order) {
 			await sdk.order.fill(order, { amount: parseInt(purchaseOrderForm.amount) }).then(a => a.build().runAll())
 		}
