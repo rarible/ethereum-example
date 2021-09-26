@@ -12,6 +12,7 @@ import { toAddress, toBigNumber } from "@rarible/types"
 import { NftCollection_Type, NftItem } from "@rarible/protocol-api-client"
 import { debounce } from "./utils/debounce"
 import { retry } from "./utils/retry"
+import { toBN } from "web3-utils"
 
 type CreateOrderFormState = {
 	contract: string,
@@ -59,6 +60,47 @@ const Dashboard: React.FC<DashboardProps> = ({ provider, sdk, accounts }) => {
 	 */
 	const connectWalletHandler = () => {
 		provider.request({ method: 'eth_requestAccounts' })
+	}
+
+	async function buyGenArt() {
+		const order = await sdk.apis.order.getOrderByHash({ hash: "0x8b2c609e8e20b19d2d656a4592a315b9fd04b09484aa619a586133a36e157264" })
+		const ab = await sdk.order.fill(order, { amount: 1 })
+		const tx = await ab.build().runAll()
+		const receipt = await tx.wait()
+		console.log(receipt)
+		const ids = receipt.events
+			.filter((e: any) => e.raw && e.raw.topics[0] === "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef")
+			.map((e: any) => e.raw.topics[3])
+			.map((e: any) => toBN(e).toString(10))
+		console.log("ids are", ids)
+	}
+
+	async function genArt() {
+		const ab = await sdk.order.upsertOrder({
+			maker: toAddress(accounts[0]),
+			type: "RARIBLE_V2",
+			make: {
+				value: toBigNumber("10000"),
+				assetType: {
+					assetClass: "GEN_ART",
+					contract: toAddress("0x375f8fa95573b48dcdab0f8836b0a19e8a430122")
+				}
+			},
+			take: {
+				value: toBigNumber("10000000"),
+				assetType: {
+					assetClass: "ETH"
+				}
+			},
+			data: {
+				"dataType": "RARIBLE_V2_DATA_V1",
+				payouts: [],
+				originFees: []
+			},
+			salt: toBigNumber("10")
+		})
+		const order = await ab.build().runAll()
+		console.log("order is", order)
 	}
 
 	/**
@@ -238,6 +280,8 @@ const Dashboard: React.FC<DashboardProps> = ({ provider, sdk, accounts }) => {
               &nbsp;&nbsp;
           </p>}
 					<button onClick={mint}>mint</button>
+					<button onClick={genArt}>gen-art</button>
+					<button onClick={buyGenArt}>buy-gen-art</button>
 				</div>
 				<hr/>
 			</div>
