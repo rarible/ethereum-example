@@ -1,10 +1,7 @@
 import { SellRequest } from "@rarible/protocol-ethereum-sdk/build/order/sell"
 import React, { useState } from "react"
 import {
-	isLazyErc1155Collection,
-	isLazyErc721Collection,
-	isLegacyErc1155Collection,
-	isLegacyErc721Collection,
+	isErc1155v1Collection, isErc1155v2Collection, isErc721v1Collection, isErc721v2Collection, isErc721v3Collection,
 	RaribleSdk,
 } from "@rarible/protocol-ethereum-sdk"
 import { toAddress, toBigNumber } from "@rarible/types"
@@ -65,7 +62,7 @@ const Dashboard: React.FC<DashboardProps> = ({ provider, sdk, accounts }) => {
 	const mint = async () => {
 		let tokenId: string
 		const nftCollection = await sdk.apis.nftCollection.getNftCollectionById({ collection: collection.id })
-		if (isLazyErc721Collection(nftCollection)) {
+		if (isErc721v3Collection(nftCollection)) {
 			const resp = await sdk.nft.mint({
 				collection: nftCollection,
 				uri: "/ipfs/QmWLsBu6nS4ovaHbGAXprD1qEssJu4r5taQfB74sCG51tp",
@@ -74,28 +71,35 @@ const Dashboard: React.FC<DashboardProps> = ({ provider, sdk, accounts }) => {
 				lazy: collection.isLazy,
 			})
 			tokenId = resp.tokenId
-		} else if (isLazyErc1155Collection(nftCollection)) {
+		} else if (isErc1155v2Collection(nftCollection)) {
 			const resp = await sdk.nft.mint({
 				collection: nftCollection,
 				uri: "/ipfs/QmWLsBu6nS4ovaHbGAXprD1qEssJu4r5taQfB74sCG51tp",
 				creators: [{ account: toAddress(accounts[0]), value: 10000 }],
 				royalties: [],
-				supply: toBigNumber('1'),
+				supply: 1,
 				lazy: collection.isLazy,
 			})
 			tokenId = resp.tokenId
-		} else if (isLegacyErc721Collection(nftCollection)) {
+		} else if (isErc721v2Collection(nftCollection)) {
 			const resp = await sdk.nft.mint({
 				collection: nftCollection,
 				uri: "/ipfs/QmWLsBu6nS4ovaHbGAXprD1qEssJu4r5taQfB74sCG51tp",
 				royalties: [],
 			})
 			tokenId = resp.tokenId
-		} else if (isLegacyErc1155Collection(nftCollection)) {
+		} else if (isErc1155v1Collection(nftCollection)) {
 			const resp = await sdk.nft.mint({
 				collection: nftCollection,
 				uri: "/ipfs/QmWLsBu6nS4ovaHbGAXprD1qEssJu4r5taQfB74sCG51tp",
 				royalties: [],
+				supply: 1,
+			})
+			tokenId = resp.tokenId
+		} else if (isErc721v1Collection(nftCollection)) {
+			const resp = await sdk.nft.mint({
+				collection: nftCollection,
+				uri: "/ipfs/QmWLsBu6nS4ovaHbGAXprD1qEssJu4r5taQfB74sCG51tp",
 				supply: 1,
 			})
 			tokenId = resp.tokenId
@@ -149,7 +153,7 @@ const Dashboard: React.FC<DashboardProps> = ({ provider, sdk, accounts }) => {
 				takeAssetType: { assetClass: "ETH" },
 			}
 			// Create an order
-			const resultOrder = await sdk.order.sell(request).then(a => a.build().runAll())
+			const resultOrder = await sdk.order.sell(request)
 			if (resultOrder) {
 				setPurchaseOrderForm({ ...purchaseOrderForm, hash: resultOrder.hash })
 			}
@@ -161,8 +165,18 @@ const Dashboard: React.FC<DashboardProps> = ({ provider, sdk, accounts }) => {
 	 */
 	const handlePurchaseOrder = async () => {
 		const order = await sdk.apis.order.getOrderByHash({ hash: purchaseOrderForm.hash })
-		if (order) {
-			await sdk.order.fill(order, { amount: parseInt(purchaseOrderForm.amount) }).then(a => a.build().runAll())
+		switch (order.type) {
+			case "RARIBLE_V1":
+				await sdk.order.fill({ order, amount: parseInt(purchaseOrderForm.amount), originFee: 0 })
+				break;
+			case "RARIBLE_V2":
+				await sdk.order.fill({ order, amount: parseInt(purchaseOrderForm.amount) })
+				break;
+			case "OPEN_SEA_V1":
+				await sdk.order.fill({ order, amount: parseInt(purchaseOrderForm.amount) })
+				break;
+			default:
+				throw new Error(`Unsupported order : ${JSON.stringify(order)}`)
 		}
 	}
 
@@ -200,7 +214,7 @@ const Dashboard: React.FC<DashboardProps> = ({ provider, sdk, accounts }) => {
 			await searchType(value)
 		}
 	}
-	const handleChangeLazy = (e: React.FormEvent<HTMLInputElement>): void => {
+	const handleChangeLazy = (): void => {
 		setCollection(prevState => ({ ...prevState, isLazy: !prevState.isLazy }))
 	}
 	const handleChangeOrderContract = (e: React.FormEvent<HTMLInputElement>): void => {
