@@ -1,4 +1,4 @@
-# Rarible protocol ethereum sdk react example
+# Rarible Protocol Ethereum SDK React Example
 
 In this example we're using [Metamask](https://metamask.io/) wallet to interact with ethereum blockchain.
 
@@ -221,3 +221,11 @@ const handleGetMyNfts = async () => {
     setOwnedItems(items?.items)
 }
 ```
+
+## Suggestions
+
+You are welcome to [suggest features](https://github.com/rarible/protocol/discussions) and [report bugs found](https://github.com/rarible/protocol/issues)!
+
+## License
+
+Rarible Protocol Ethereum SDK React Example is available under [MIT License](LICENSE).
