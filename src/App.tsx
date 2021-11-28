@@ -5,8 +5,6 @@ import './App.css'
 import Dashboard from "./Dashboard"
 import { Web3Ethereum } from "@rarible/web3-ethereum"
 
-const NETWORK = "rinkeby"
-
 function App() {
 	const [provider, setProvider] = useState<any>()
 	const [sdk, setSdk] = useState<RaribleSdk>()
@@ -39,7 +37,7 @@ function App() {
 			// configure web3
 			const web3 = new Web3(ethereum)
 			// configure raribleSdk
-			const raribleSdk = createRaribleSdk(new Web3Ethereum({ web3 }), NETWORK)
+			const raribleSdk = createRaribleSdk(new Web3Ethereum({ web3 }), "rinkeby")
 			setSdk(raribleSdk)
 			// set current account if already connected
 			web3.eth.getAccounts().then(e => {

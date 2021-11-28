@@ -1,13 +1,18 @@
 import { SellRequest } from "@rarible/protocol-ethereum-sdk/build/order/sell"
 import React, { useState } from "react"
 import {
-	isErc1155v1Collection, isErc1155v2Collection, isErc721v1Collection, isErc721v2Collection, isErc721v3Collection,
+	isErc1155v1Collection,
+	isErc1155v2Collection,
+	isErc721v1Collection,
+	isErc721v2Collection,
+	isErc721v3Collection,
 	RaribleSdk,
 } from "@rarible/protocol-ethereum-sdk"
 import { toAddress, toBigNumber } from "@rarible/types"
-import { NftCollection_Type, NftItem } from "@rarible/protocol-api-client"
+import { NftCollectionFeatures, NftItem } from "@rarible/ethereum-api-client"
 import { debounce } from "./utils/debounce"
 import { retry } from "./utils/retry"
+import { NftCollectionType } from "@rarible/ethereum-api-client/build/models/NftCollection"
 
 type CreateOrderFormState = {
 	contract: string,
@@ -28,16 +33,15 @@ type DashboardProps = {
 }
 
 
-type MintForm = { id: string, type: NftCollection_Type, isLazySupported: boolean, isLazy: boolean, loading: boolean }
+type MintForm = { id: string, type: NftCollectionType, isLazySupported: boolean, isLazy: boolean, loading: boolean }
 
 const mintFormInitial: MintForm = {
 	id: "0x6ede7f3c26975aad32a475e1021d8f6f39c89d82", // default collection on "rinkeby" that supports lazy minting
-	type: "ERC721",
+	type: NftCollectionType.ERC721,
 	isLazy: true,
 	isLazySupported: true,
 	loading: false,
 }
-
 
 const Dashboard: React.FC<DashboardProps> = ({ provider, sdk, accounts }) => {
 	const [collection, setCollection] = useState<MintForm>(mintFormInitial)
@@ -65,7 +69,7 @@ const Dashboard: React.FC<DashboardProps> = ({ provider, sdk, accounts }) => {
 		if (isErc721v3Collection(nftCollection)) {
 			const resp = await sdk.nft.mint({
 				collection: nftCollection,
-				uri: "/ipfs/QmWLsBu6nS4ovaHbGAXprD1qEssJu4r5taQfB74sCG51tp",
+				uri: "ipfs://ipfs/QmWLsBu6nS4ovaHbGAXprD1qEssJu4r5taQfB74sCG51tp",
 				creators: [{ account: toAddress(accounts[0]), value: 10000 }],
 				royalties: [],
 				lazy: collection.isLazy,
@@ -124,7 +128,7 @@ const Dashboard: React.FC<DashboardProps> = ({ provider, sdk, accounts }) => {
 	}
 
 	const getTokenById = async (tokenId: string) => {
-		const token = await sdk.apis.nftItem.getNftItemById({ itemId: `0x6ede7f3c26975aad32a475e1021d8f6f39c89d82:${tokenId}` })
+		const token = await sdk.apis.nftItem.getNftItemById({ itemId: `${collection.id}:${tokenId}` })
 		if (token) {
 			setCreateOrderForm({
 				...createOrderForm,
@@ -198,7 +202,7 @@ const Dashboard: React.FC<DashboardProps> = ({ provider, sdk, accounts }) => {
 			setCollection(prevState => ({
 				...prevState,
 				type: collectionResponse.type,
-				isLazySupported: collectionResponse.features.includes("MINT_AND_TRANSFER"), // check if it supports lazy minting
+				isLazySupported: collectionResponse.features.includes(NftCollectionFeatures.MINT_AND_TRANSFER), // check if it supports lazy minting
 				loading: false,
 			}))
 		}
