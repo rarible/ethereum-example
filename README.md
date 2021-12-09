@@ -1,87 +1,84 @@
 # Rarible Protocol Ethereum SDK React Example
 
-In this example we're using [Metamask](https://metamask.io/) wallet to interact with ethereum blockchain.
-
 What we have done in this example:
 
-- Configure RaribleSDK
-- Create Lazy mint NFT item
+- Configure Rarible Protocol Ethereum SDK
+- Create Lazy Minting NFT item
 - Create sell order
 - Purchase (buy item) an order
 - Get your own NFT from your current wallet
 
-Lets start new react ts project and add dependencies
+In this example we're using [Metamask](https://metamask.io/) wallet to interact with ethereum blockchain.
 
-```shell
-npx create-react-app protocol-example --template typescript
+## Install
 
-yarn add @rarible/protocol-ethereum-sdk@0.1.4 @ethereumjs/common@^2.4.0 @ethereumjs/tx@^3.3.0 @rarible/action@0.2.5 @rarible/protocol-api-client@0.1.4 ethereumjs-util@^7.1.0 tslib@^2.3.1 web3@1.2.11 web3-eth-contract@1.2.11 web3-utils@1.2.11 @rarible/types@0.1.2
-```
+1. Clone repository
+2. Install dependencies in the project folder:
 
-```create-react-app``` - creates blank react app project. Learn more about command options on their
-github [CRA](https://github.com/facebook/create-react-app) repo
+    ```shell
+    yarn
+    ```
 
-#### Configuring RaribleSDK
+3. Start application:
 
-For this example we use simple non styled .tsx template and local state management. full example of app you can find
-in `src/` folder in root of repository in App.tsx and Dashboard.tsx components.
+    ```shell
+    yarn start
+    ```
 
-Let's create a new function in the App.tsx file named `handleInit`. Which serves to check the presence of the Metamask
-provider in the browser and create an instance of the SDK.
+The application is available at [http://localhost:3000](http://localhost:3000)
+
+## Configuring
+
+We use a simple non-styled .tsx template and local state management for this example. Full example of app you can find
+in `src/` folder in the repository's root in App.tsx and Dashboard.tsx components.
+
+Function `handleInit` in the App.tsx check the presence of the Metamask provider in the browser and create an instance of the SDK.
 
 ```typescript
- function handleInit() {
-    const { ethereum } = window as any;
-    if (ethereum && ethereum.isMetaMask) {
-        console.log('Ethereum successfully detected!');
-        // set thereum provider into state to connet to wallet in next steps
-        setProvider(ethereum) 
+function handleInit() {
+	const { ethereum } = window as any
+	if (ethereum && ethereum.isMetaMask) {
+		console.log('Ethereum successfully detected!')
+		setProvider(ethereum)
 
-        // add listener on accountsChanged event to render actual address
-        ethereum.on('accountsChanged', function (accounts: string[]) {
-            setAccounts(accounts)
-        });
-        
-        // configure web3
-        const web3 = new Web3(ethereum)
-        
-        // configure raribleSdk
-			const raribleSdk = createRaribleSdk(new Web3Ethereum({ web3 }), network)
-        // set created Rarible SDK into state
-        setSdk(raribleSdk)
-        
-        // set current account if already connected
-        web3.eth.getAccounts().then(e => {
-            setAccounts(e)
-        })
-    } else {
-        console.log('Please install MetaMask!');
-    }
+		// add listener on accountsChanged event to render actual address
+		ethereum.on('accountsChanged', setAccounts)
+		// configure web3
+		const web3 = new Web3(ethereum)
+		// configure raribleSdk
+		const raribleSdk = createRaribleSdk(new Web3Ethereum({ web3 }), "rinkeby")
+		setSdk(raribleSdk)
+		// set current account if already connected
+		web3.eth.getAccounts().then(e => {
+			setAccounts(e)
+		})
+	} else {
+		console.log('Please install MetaMask!')
+	}
 }
-
 ```
 
-Now we will create a hook that will be launched when the App component is mounted, and add to it a simple check for the
-presence of the provider object in the browser and run the previously created `handleInit` function if it exists.
+This hook will be launched when the App component is mounted. It also checks for the
+presence of the provider object in the browser and runs the previously created `handleInit` function if it exists.
 
 ```typescript
 useEffect(() => {
-    if ((window as any).ethereum) {
-        handleInit();
-    } else {
-        window.addEventListener('ethereum#initialized', handleInit, {
-            once: true,
-        });
-        setTimeout(handleInit, 3000);
-    }
+	if ((window as any).ethereum) {
+		handleInit()
+	} else {
+		window.addEventListener('ethereum#initialized', handleInit, {
+			once: true,
+		})
+		setTimeout(handleInit, 3000) // 3 seconds
+	}
 
 }, [])
 ```
 
-#### Mint NFT items
+## Mint NFT Items
 
-We can mint ERC721 or ERC1155 nft items through Rarible SDK, and both of it can be minted "on chain" of "off chain"(
-lazy).
+We can mint ERC-721 or ERC-1155 NFT items through Rarible Protocol Ethereum SDK, and both of them can be minted "on-chain" or "off-chain" (
+lazy minting).
 
 The code below shows how you can mint nft token using SDK. Full component code example located in `src/Dashboard.tsx`
 
@@ -96,56 +93,73 @@ type MintForm = {
 
 const mintFormInitial: MintForm = {
 	id: "0x6ede7f3c26975aad32a475e1021d8f6f39c89d82", // default collection on "rinkeby" that supports lazy minting
-	type: "ERC721",
+	type: NftCollectionType.ERC721,
 	isLazy: true,
 	isLazySupported: true,
 	loading: false,
 }
-...
 
 const Dashboard: React.FC<DashboardProps> = ({ provider, sdk, accounts }) => {
-
 	const [collection, setCollection] = useState<MintForm>(mintFormInitial)
-...
+	const [ownedItems, setOwnedItems] = useState<NftItem[]>()
+	const [createOrderForm, setCreateOrderForm] = useState<CreateOrderFormState>({
+		contract: '',
+		tokenId: '',
+		price: '10',
+		hash: '',
+	})
+	const [purchaseOrderForm, setPurchaseOrderForm] = useState<BuyOrderFormState>({ hash: '', amount: '1' })
+	/**
+	 * Handle connect to wallet
+	 */
+	const connectWalletHandler = () => {
+		provider.request({ method: 'eth_requestAccounts' })
+	}
 
-...
 	const mint = async () => {
 		let tokenId: string
-		const prepareCollection = {
-			id: toAddress(collection.id),
-			type: collection.type,
-			supportsLazyMint: collection.isLazySupported,
-		}
-		if (isLazyErc721Collection(prepareCollection)) {
-			tokenId = await sdk.nft.mint({
-				collection: prepareCollection,
-				uri: "/ipfs/QmWLsBu6nS4ovaHbGAXprD1qEssJu4r5taQfB74sCG51tp",
+		const nftCollection = await sdk.apis.nftCollection.getNftCollectionById({ collection: collection.id })
+		if (isErc721v3Collection(nftCollection)) {
+			const resp = await sdk.nft.mint({
+				collection: nftCollection,
+				uri: "ipfs://ipfs/QmWLsBu6nS4ovaHbGAXprD1qEssJu4r5taQfB74sCG51tp",
 				creators: [{ account: toAddress(accounts[0]), value: 10000 }],
 				royalties: [],
 				lazy: collection.isLazy,
 			})
-		} else if (isLazyErc1155Collection(prepareCollection)) {
-			tokenId = await sdk.nft.mint({
-				collection: prepareCollection,
+			tokenId = resp.tokenId
+		} else if (isErc1155v2Collection(nftCollection)) {
+			const resp = await sdk.nft.mint({
+				collection: nftCollection,
 				uri: "/ipfs/QmWLsBu6nS4ovaHbGAXprD1qEssJu4r5taQfB74sCG51tp",
 				creators: [{ account: toAddress(accounts[0]), value: 10000 }],
 				royalties: [],
-				supply: toBigNumber('1'),
+				supply: 1,
 				lazy: collection.isLazy,
 			})
-		} else if (isLegacyErc721Collection(prepareCollection)) {
-			tokenId = await sdk.nft.mint({
-				collection: prepareCollection,
+			tokenId = resp.tokenId
+		} else if (isErc721v2Collection(nftCollection)) {
+			const resp = await sdk.nft.mint({
+				collection: nftCollection,
 				uri: "/ipfs/QmWLsBu6nS4ovaHbGAXprD1qEssJu4r5taQfB74sCG51tp",
 				royalties: [],
 			})
-		} else if (isLegacyErc1155Collection(prepareCollection)) {
-			tokenId = await sdk.nft.mint({
-				collection: prepareCollection,
+			tokenId = resp.tokenId
+		} else if (isErc1155v1Collection(nftCollection)) {
+			const resp = await sdk.nft.mint({
+				collection: nftCollection,
 				uri: "/ipfs/QmWLsBu6nS4ovaHbGAXprD1qEssJu4r5taQfB74sCG51tp",
 				royalties: [],
 				supply: 1,
 			})
+			tokenId = resp.tokenId
+		} else if (isErc721v1Collection(nftCollection)) {
+			const resp = await sdk.nft.mint({
+				collection: nftCollection,
+				uri: "/ipfs/QmWLsBu6nS4ovaHbGAXprD1qEssJu4r5taQfB74sCG51tp",
+				supply: 1,
+			})
+			tokenId = resp.tokenId
 		} else {
 			tokenId = ""
 			console.log("Wrong collection")
@@ -167,58 +181,65 @@ const Dashboard: React.FC<DashboardProps> = ({ provider, sdk, accounts }) => {
 	}
 ```
 
-#### Create sell order
+## Create Sell Order
 
-Function below creates a order for sale.
+The function below creates Sell Order from minted NFT.
 
 ```typescript
 const createSellOrder = async () => {
-    if (createOrderForm.contract && createOrderForm.tokenId && createOrderForm.price) {
-    	
-        // Create an order
-        const resultOrder = await sdk?.order.sell(
-            {
-                makeAssetType: {
-                    assetClass: "ERC721",
-                    contract: toAddress(createOrderForm.contract),
-                    tokenId: toBigNumber(createOrderForm.tokenId),
-                }, // asset type, must includes contract address and tokenId
-                amount: 1, // amount to sell, in our case for ERC721 always will be 1
-                maker: toAddress(accounts[0]), // who sell an item
-                originFees: [], // fees description
-                payouts: [], // payouts
-                price: toBigNumber(createOrderForm.price),
-                takeAssetType: { assetClass: "ETH" }, // for what currency
-            }
-        ).then(a => a.runAll())
-      
-      if (resultOrder) {
-            setOrder(resultOrder)
-            setPurchaseOrderForm({ ...purchaseOrderForm, hash: resultOrder.hash })
-        }
-    }
+	if (createOrderForm.contract && createOrderForm.tokenId && createOrderForm.price) {
+		const request: SellRequest = {
+			makeAssetType: {
+				assetClass: collection.type,
+				contract: toAddress(createOrderForm.contract),
+				tokenId: toBigNumber(createOrderForm.tokenId),
+			},
+			amount: 1,
+			maker: toAddress(accounts[0]),
+			originFees: [],
+			payouts: [],
+			price: createOrderForm.price,
+			takeAssetType: { assetClass: "ETH" },
+		}
+		// Create an order
+		const resultOrder = await sdk.order.sell(request)
+		if (resultOrder) {
+			setPurchaseOrderForm({ ...purchaseOrderForm, hash: resultOrder.hash })
+		}
+	}
 }
 ```
 
-#### Purchase (buy item) an order
+## Purchase an order (buy item)
 
 ```typescript
 const handlePurchaseOrder = async () => {
-    if (order) {
-        await sdk?.order.fill(order, { amount: parseInt(purchaseOrderForm.amount) }).then(a => a.runAll())
-    }
+	const order = await sdk.apis.order.getOrderByHash({ hash: purchaseOrderForm.hash })
+	switch (order.type) {
+		case "RARIBLE_V1":
+			await sdk.order.fill({ order, amount: parseInt(purchaseOrderForm.amount), originFee: 0 })
+			break;
+		case "RARIBLE_V2":
+			await sdk.order.fill({ order, amount: parseInt(purchaseOrderForm.amount) })
+			break;
+		case "OPEN_SEA_V1":
+			await sdk.order.fill({ order, amount: parseInt(purchaseOrderForm.amount) })
+			break;
+		default:
+			throw new Error(`Unsupported order : ${JSON.stringify(order)}`)
+	}
 }
 ```
 
 `sdk.order.fill` takes the `order` object (which we got in the previous step) and the `amount` to buy as arguments, and
-returns hash of transaction
+returns hash of the transaction.
 
-#### Get your own NFT from your current wallet
+## Get your own NFT from your current wallet
 
 ```typescript
 const handleGetMyNfts = async () => {
-    const items = await sdk?.apis.nftItem.getNftItemsByOwner({ owner: accounts[0] })
-    setOwnedItems(items?.items)
+	const items = await sdk.apis.nftItem.getNftItemsByOwner({ owner: accounts[0] })
+	setOwnedItems(items?.items)
 }
 ```
 
