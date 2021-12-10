@@ -200,17 +200,17 @@ const createSellOrder = async () => {
 }
 ```
 
-#### Purchase (buy item) an order
+#### Buy item (fill sell order)
 
 ```typescript
 const handlePurchaseOrder = async () => {
     if (order) {
-        await sdk?.order.fill(order, { amount: parseInt(purchaseOrderForm.amount) }).then(a => a.runAll())
+        await sdk?.order.buy(order, { amount: parseInt(purchaseOrderForm.amount) }).then(a => a.runAll())
     }
 }
 ```
 
-`sdk.order.fill` takes the `order` object (which we got in the previous step) and the `amount` to buy as arguments, and
+`sdk.order.buy` takes the `order` object (which we got in the previous step) and the `amount` to buy as arguments, and
 returns hash of transaction
 
 #### Get your own NFT from your current wallet
