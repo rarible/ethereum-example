@@ -37,7 +37,7 @@ function App() {
 			// configure web3
 			const web3 = new Web3(ethereum)
 			// configure raribleSdk
-			const raribleSdk = createRaribleSdk(new Web3Ethereum({ web3 }), "rinkeby")
+			const raribleSdk = createRaribleSdk(new Web3Ethereum({ web3 }), "mumbai")
 			setSdk(raribleSdk)
 			// set current account if already connected
 			web3.eth.getAccounts().then(e => {

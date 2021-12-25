@@ -36,9 +36,9 @@ type DashboardProps = {
 type MintForm = { id: string, type: NftCollectionType, isLazySupported: boolean, isLazy: boolean, loading: boolean }
 
 const mintFormInitial: MintForm = {
-	id: "0x6ede7f3c26975aad32a475e1021d8f6f39c89d82", // default collection on "rinkeby" that supports lazy minting
+	id: "0x86516Af1F9b3c8E64F02c45377D5d785787f81cC", // default collection on "rinkeby" that supports lazy minting
 	type: NftCollectionType.ERC721,
-	isLazy: true,
+	isLazy: false,
 	isLazySupported: true,
 	loading: false,
 }
