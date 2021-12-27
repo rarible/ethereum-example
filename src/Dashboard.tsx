@@ -171,13 +171,13 @@ const Dashboard: React.FC<DashboardProps> = ({ provider, sdk, accounts }) => {
 		const order = await sdk.apis.order.getOrderByHash({ hash: purchaseOrderForm.hash })
 		switch (order.type) {
 			case "RARIBLE_V1":
-				await sdk.order.fill({ order, amount: parseInt(purchaseOrderForm.amount), originFee: 0 })
+				await sdk.order.buy({ order, amount: parseInt(purchaseOrderForm.amount), originFee: 0 })
 				break;
 			case "RARIBLE_V2":
-				await sdk.order.fill({ order, amount: parseInt(purchaseOrderForm.amount) })
+				await sdk.order.buy({ order, amount: parseInt(purchaseOrderForm.amount) })
 				break;
 			case "OPEN_SEA_V1":
-				await sdk.order.fill({ order, amount: parseInt(purchaseOrderForm.amount) })
+				await sdk.order.buy({ order, amount: parseInt(purchaseOrderForm.amount) })
 				break;
 			default:
 				throw new Error(`Unsupported order : ${JSON.stringify(order)}`)

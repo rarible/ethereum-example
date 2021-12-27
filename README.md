@@ -210,20 +210,20 @@ const createSellOrder = async () => {
 }
 ```
 
-## Purchase an order (buy item)
+## Buy item (fill sell order)
 
 ```typescript
 const handlePurchaseOrder = async () => {
 	const order = await sdk.apis.order.getOrderByHash({ hash: purchaseOrderForm.hash })
 	switch (order.type) {
 		case "RARIBLE_V1":
-			await sdk.order.fill({ order, amount: parseInt(purchaseOrderForm.amount), originFee: 0 })
+			await sdk.order.buy({ order, amount: parseInt(purchaseOrderForm.amount), originFee: 0 })
 			break;
 		case "RARIBLE_V2":
-			await sdk.order.fill({ order, amount: parseInt(purchaseOrderForm.amount) })
+			await sdk.order.buy({ order, amount: parseInt(purchaseOrderForm.amount) })
 			break;
 		case "OPEN_SEA_V1":
-			await sdk.order.fill({ order, amount: parseInt(purchaseOrderForm.amount) })
+			await sdk.order.buy({ order, amount: parseInt(purchaseOrderForm.amount) })
 			break;
 		default:
 			throw new Error(`Unsupported order : ${JSON.stringify(order)}`)
@@ -231,8 +231,8 @@ const handlePurchaseOrder = async () => {
 }
 ```
 
-`sdk.order.fill` takes the `order` object (which we got in the previous step) and the `amount` to buy as arguments, and
-returns hash of the transaction.
+`sdk.order.buy` takes the `order` object (which we got in the previous step) and the `amount` to buy as arguments, and
+returns hash of the  transaction.
 
 ## Get your own NFT from your current wallet
 
